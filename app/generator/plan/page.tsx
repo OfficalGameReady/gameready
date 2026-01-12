@@ -10,7 +10,7 @@ interface PlanItem {
   rest: string;
 }
 
-export default function PlanGenerator() {
+function PlanGeneratorContent() {
   const params = useSearchParams();
   const position = params.get('position') || '';
 
@@ -59,64 +59,70 @@ export default function PlanGenerator() {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div style={{ padding: '1rem' }}>
-        <h1>Personalized Training Plan</h1>
-        <form onSubmit={generatePlan} style={{ marginBottom: '1rem' }}>
-          <div>
-            <label>
-              Weight (lbs):&nbsp;
-              <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} required />
-            </label>
-          </div>
-          <div>
-            <label>
-              Goal:&nbsp;
-              <input
-                type="text"
-                value={goal}
-                onChange={(e) => setGoal(e.target.value)}
-                placeholder="e.g. Lose fat, Build muscle"
-                required
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              Current Stats:&nbsp;
-              <input
-                type="text"
-                value={stats}
-                onChange={(e) => setStats(e.target.value)}
-                placeholder="e.g. 40yd dash time, bench max"
-              />
-            </label>
-          </div>
-          <button type="submit">Generate Plan</button>
-        </form>
-        {plan && (
-          <table border={1} cellPadding={8} cellSpacing={0}>
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Exercise</th>
-                <th>Reps</th>
-                <th>Rest</th>
+    <div style={{ padding: '1rem' }}>
+      <h1>Personalized Training Plan</h1>
+      <form onSubmit={generatePlan} style={{ marginBottom: '1rem' }}>
+        <div>
+          <label>
+            Weight (lbs):&nbsp;
+            <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} required />
+          </label>
+        </div>
+        <div>
+          <label>
+            Goal:&nbsp;
+            <input
+              type="text"
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              placeholder="e.g. Lose fat, Build muscle"
+              required
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Current Stats:&nbsp;
+            <input
+              type="text"
+              value={stats}
+              onChange={(e) => setStats(e.target.value)}
+              placeholder="e.g. 40yd dash time, bench max"
+            />
+          </label>
+        </div>
+        <button type="submit">Generate Plan</button>
+      </form>
+      {plan && (
+        <table border={1} cellPadding={8} cellSpacing={0}>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Exercise</th>
+              <th>Reps</th>
+              <th>Rest</th>
+            </tr>
+          </thead>
+          <tbody>
+            {plan.map((item, index) => (
+              <tr key={index}>
+                <td>{item.day}</td>
+                <td>{item.exercise}</td>
+                <td>{item.reps}</td>
+                <td>{item.rest}</td>
               </tr>
-            </thead>
-            <tbody>
-              {plan.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.day}</td>
-                  <td>{item.exercise}</td>
-                  <td>{item.reps}</td>
-                  <td>{item.rest}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+export default function PlanGenerator() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PlanGeneratorContent />
     </Suspense>
   );
 }
