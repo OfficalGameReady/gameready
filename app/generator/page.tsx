@@ -2,17 +2,23 @@
 
 import { useState } from "react";
 
+interface PlanItem {
+  day: string;
+  exercise: string;
+  reps: string;
+  rest: string;
+}
+
 export default function Page() {
   const [weight, setWeight] = useState("");
   const [goal, setGoal] = useState("");
   const [stats, setStats] = useState("");
-  const [plan, setPlan] = useState(null);
+  const [plan, setPlan] = useState<PlanItem[] | null>(null);
 
-  const generatePlan = (e) => {
+  const generatePlan = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    // Generate a simple plan. In a real app you would customise based on inputs.
-    const newPlan = days.map((day) => ({
+    const newPlan: PlanItem[] = days.map((day) => ({
       day,
       exercise: "Bodyweight exercises",
       reps: "3 x 10",
@@ -22,7 +28,6 @@ export default function Page() {
   };
 
   const exportPDF = () => {
-    // Use browser print dialog; the user can save to PDF
     if (typeof window !== "undefined") {
       window.print();
     }
@@ -31,7 +36,10 @@ export default function Page() {
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Weekly Training Plan Generator</h1>
-      <form onSubmit={generatePlan} style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "400px" }}>
+      <form
+        onSubmit={generatePlan}
+        style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "400px" }}
+      >
         <label>
           Weight (kg or lbs):
           <input
@@ -59,7 +67,10 @@ export default function Page() {
             style={{ width: "100%" }}
           />
         </label>
-        <button type="submit" style={{ padding: "0.5rem", backgroundColor: "#0070f3", color: "white", border: "none" }}>
+        <button
+          type="submit"
+          style={{ padding: "0.5rem", backgroundColor: "#0070f3", color: "white", border: "none" }}
+        >
           Generate Plan
         </button>
       </form>
@@ -86,7 +97,10 @@ export default function Page() {
               ))}
             </tbody>
           </table>
-          <button onClick={exportPDF} style={{ marginTop: "1rem", padding: "0.5rem", backgroundColor: "#0070f3", color: "white", border: "none" }}>
+          <button
+            onClick={exportPDF}
+            style={{ marginTop: "1rem", padding: "0.5rem", backgroundColor: "#0070f3", color: "white", border: "none" }}
+          >
             Export as PDF
           </button>
         </div>
