@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface PlanItem {
   day: string;
@@ -10,69 +11,103 @@ interface PlanItem {
 }
 
 export default function PlanGenerator() {
+  const params = useSearchParams();
+  const position = params.get('position') || '';
+
   const [weight, setWeight] = useState('');
   const [goal, setGoal] = useState('');
   const [stats, setStats] = useState('');
   const [plan, setPlan] = useState<PlanItem[] | null>(null);
 
+  const getExercisesForPosition = (pos: string): string[] => {
+    switch (pos.toLowerCase()) {
+      case 'wr':
+      case 'wide receiver':
+        return ['Sprint drills', 'Route running', 'Agility ladder', 'Plyometric jumps'];
+      case 'rb':
+      case 'running back':
+        return ['Deadlifts', 'Squats', 'Sled pushes', 'Jump rope'];
+      case 'qb':
+      case 'quarterback':
+        return ['Throwing practice', 'Core stability', 'Footwork drills', 'Resistance band pulls'];
+      default:
+        return ['Full-body circuit', 'Interval sprints', 'Core workout', 'Strength training'];
+    }
+  };
+
+  const getWorkoutParams = (goalValue: string): { reps: string; rest: string } => {
+    const g = goalValue.toLowerCase();
+    if (g.includes('lose') || g.includes('weight') || g.includes('cut') || g.includes('fat')) {
+      return { reps: '3 rounds of 15-20 reps', rest: '30 seconds' };
+    }
+    if (g.includes('gain') || g.includes('build') || g.includes('bulk')) {
+      return { reps: '4 sets of 8-12 reps', rest: '90 seconds' };
+    }
+    if (g.includes('strength')) {
+      return { reps: '5 sets of 5 reps', rest: '120 seconds' };
+    }
+    return { reps: '3 sets of 10 reps', rest: '60 seconds' };
+  };
+
   const generatePlan = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-    const newPlan: PlanItem[] = days.map(day => ({
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const exercises = getExercisesForPosition(position);
+    const { reps, rest } = getWorkoutParams(goal);
+    const newPlan: PlanItem[] = days.map((day, index) => ({
       day,
-      exercise: 'Bodyweight exercises',
-      reps: '3 sets of 10',
-      rest: '60 seconds',
+      exercise: exercises[index % exercises.length],
+      reps,
+      rest
     }));
     setPlan(newPlan);
   };
 
-  const exportPDF = () => {
-    window.print();
-  };
-
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
-      <h1>Weekly Training Plan Generator</h1>
-      <form onSubmit={generatePlan} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <label>
-          Weight:
-          <input type="text" value={weight} onChange={e => setWeight(e.target.value)} required />
-        </label>
-        <label>
-          Goal:
-          <input type="text" value={goal} onChange={e => setGoal(e.target.value)} required />
-        </label>
-        <label>
-          Current Stats:
-          <input type="text" value={stats} onChange={e => setStats(e.target.value)} required />
-        </label>
+    <div style={{ padding: '1rem' }}>
+      <h1>Personalized Training Plan</h1>
+      <form onSubmit={generatePlan} style={{ marginBottom: '1rem' }}>
+        <div>
+          <label>
+            Weight (lbs):&nbsp;
+            <input type="number" value={weight} onChange={e => setWeight(e.target.value)} required />
+          </label>
+        </div>
+        <div>
+          <label>
+            Goal:&nbsp;
+            <input type="text" value={goal} onChange={e => setGoal(e.target.value)} placeholder="e.g. Lose fat, Build muscle" required />
+          </label>
+        </div>
+        <div>
+          <label>
+            Current Stats:&nbsp;
+            <input type="text" value={stats} onChange={e => setStats(e.target.value)} placeholder="e.g. 40yd dash time, bench max" />
+          </label>
+        </div>
         <button type="submit">Generate Plan</button>
       </form>
       {plan && (
-        <div style={{ marginTop: '2rem' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Day</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Exercise</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Reps</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Rest</th>
+        <table border={1} cellPadding={8} cellSpacing={0}>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Exercise</th>
+              <th>Reps/Duration</th>
+              <th>Rest</th>
+            </tr>
+          </thead>
+          <tbody>
+            {plan.map((item, idx) => (
+              <tr key={idx}>
+                <td>{item.day}</td>
+                <td>{item.exercise}</td>
+                <td>{item.reps}</td>
+                <td>{item.rest}</td>
               </tr>
-            </thead>
-            <tbody>
-              {plan.map((item, idx) => (
-                <tr key={idx}>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.day}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.exercise}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.reps}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.rest}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button onClick={exportPDF} style={{ marginTop: '1rem' }}>Export as PDF</button>
-        </div>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
