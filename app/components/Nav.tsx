@@ -78,6 +78,7 @@ export default function Nav() {
 
         {open && (
           <div ref={menuRef} className="menu-panel" role="menu" style={stylePos ?? undefined}>
+            <a href="/" className="menu-item">Home</a>
             <a href="#why" className="menu-item">Why</a>
             <a href="/generator" className="menu-item">Generator</a>
             <a href="/about" className="menu-item">About</a>
