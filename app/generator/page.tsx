@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useRouter } from 'next/navigation';
 
@@ -24,6 +24,7 @@ export default function SportSelection() {
             flexDirection: 'column',
             alignItems: 'center',
             gap: '0.5rem',
+            color: '#000',
           }}
         >
           <span style={{ fontSize: '2rem' }}>🏈</span>
