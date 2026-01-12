@@ -1,110 +1,81 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useRouter } from 'next/navigation';
 
-interface PlanItem {
-  day: string;
-  exercise: string;
-  reps: string;
-  rest: string;
-}
+export default function GeneratorSelection() {
+  const router = useRouter();
+  const positions = [
+    'Quarterback',
+    'Running Back',
+    'Wide Receiver',
+    'Tight End',
+    'Offensive Line',
+    'Defensive Line',
+    'Linebacker',
+    'Cornerback',
+    'Safety',
+    'Kicker',
+    'Punter',
+  ];
 
-export default function Page() {
-  const [weight, setWeight] = useState("");
-  const [goal, setGoal] = useState("");
-  const [stats, setStats] = useState("");
-  const [plan, setPlan] = useState<PlanItem[] | null>(null);
-
-  const generatePlan = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    const newPlan: PlanItem[] = days.map((day) => ({
-      day,
-      exercise: "Bodyweight exercises",
-      reps: "3 x 10",
-      rest: "60s",
-    }));
-    setPlan(newPlan);
-  };
-
-  const exportPDF = () => {
-    if (typeof window !== "undefined") {
-      window.print();
-    }
+  const handleClick = (pos: string) => {
+    // In the future we might pass the selected sport and position as query parameters.
+    router.push('/generator/plan');
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Weekly Training Plan Generator</h1>
-      <form
-        onSubmit={generatePlan}
-        style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "400px" }}
-      >
-        <label>
-          Weight (kg or lbs):
-          <input
-            type="number"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </label>
-        <label>
-          Goal:
-          <input
-            type="text"
-            value={goal}
-            onChange={(e) => setGoal(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </label>
-        <label>
-          Current Stats:
-          <input
-            type="text"
-            value={stats}
-            onChange={(e) => setStats(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </label>
-        <button
-          type="submit"
-          style={{ padding: "0.5rem", backgroundColor: "#0070f3", color: "white", border: "none" }}
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
+      <h1>Select Your Sport and Position</h1>
+      <p>Please choose your sport and position to generate a custom training plan.</p>
+
+      {/* Sport section */}
+      <div style={{ marginTop: '2rem' }}>
+        <h2>Football</h2>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            justifyContent: 'center',
+            marginTop: '1rem',
+          }}
         >
-          Generate Plan
-        </button>
-      </form>
-      {plan && (
-        <div style={{ marginTop: "2rem" }} id="plan">
-          <h2>Your 7-Day Plan</h2>
-          <table style={{ borderCollapse: "collapse", width: "100%" }}>
-            <thead>
-              <tr>
-                <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>Day</th>
-                <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>Exercise</th>
-                <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>Reps</th>
-                <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>Rest</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plan.map((item) => (
-                <tr key={item.day}>
-                  <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>{item.day}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>{item.exercise}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>{item.reps}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>{item.rest}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button
-            onClick={exportPDF}
-            style={{ marginTop: "1rem", padding: "0.5rem", backgroundColor: "#0070f3", color: "white", border: "none" }}
-          >
-            Export as PDF
-          </button>
+          {positions.map((pos) => (
+            <button
+              key={pos}
+              onClick={() => handleClick(pos)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '140px',
+                height: '120px',
+                padding: '1rem',
+                borderRadius: '12px',
+                border: '1px solid #ccc',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                transition: 'transform 0.1s, box-shadow 0.2s',
+              }}
+              onMouseOver={(e) => {
+                const target = e.currentTarget as HTMLButtonElement;
+                target.style.transform = 'translateY(-4px)';
+                target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+              }}
+              onMouseOut={(e) => {
+                const target = e.currentTarget as HTMLButtonElement;
+                target.style.transform = '';
+                target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              }}
+            >
+              <span style={{ fontSize: '2rem' }}>🏈</span>
+              <span style={{ marginTop: '0.5rem' }}>{pos}</span>
+            </button>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }
